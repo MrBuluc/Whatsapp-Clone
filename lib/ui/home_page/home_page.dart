@@ -28,29 +28,49 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Whatsapp Clone"),
-        bottom: TabBar(
-          controller: tabController,
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.camera),
-            ),
-            Tab(
-              text: "Chats",
-            ),
-          ],
-        ),
-      ),
       floatingActionButton: showMessage
           ? FloatingActionButton(
               child: const Icon(Icons.message),
               onPressed: () {},
             )
           : null,
-      body: TabBarView(
-        controller: tabController,
-        children: const [CameraPage(), ChatsPage()],
+      body: Container(
+        color: Theme.of(context).primaryColor,
+        child: SafeArea(
+          child: NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) => [
+              const SliverAppBar(
+                floating: true,
+                title: Text("Whatsapp Clone"),
+              )
+            ],
+            body: Column(
+              children: [
+                TabBar(
+                  controller: tabController,
+                  tabs: const [
+                    Tab(
+                      icon: Icon(Icons.camera),
+                    ),
+                    Tab(
+                      text: "Chats",
+                    )
+                  ],
+                ),
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                    child: TabBarView(
+                      controller: tabController,
+                      children: const [CameraPage(), ChatsPage()],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

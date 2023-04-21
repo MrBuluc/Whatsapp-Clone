@@ -41,6 +41,10 @@ class _ChatsPageState extends State<ChatsPage> {
     List<ListTile> children = [];
     for (Chat chat in chats) {
       children.add(ListTile(
+        leading: const CircleAvatar(
+          backgroundImage: NetworkImage(
+              "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/128009228/original/8e8ad34b012b46ebd403bd4157f8fef6bb2c076b/design-minimalist-flat-cartoon-caricature-avatar-in-6-hours.jpg"),
+        ),
         title: Text(chat.name!),
         subtitle: Text(chat.message!),
         trailing: Text(chat.timeConverter()),
