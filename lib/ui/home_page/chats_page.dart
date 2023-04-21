@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/model/chat.dart';
+import 'package:whatsapp_clone/ui/conversation_page/conversation_page.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 import 'package:whatsapp_clone/widgets/center_text.dart';
 
@@ -48,6 +49,12 @@ class _ChatsPageState extends State<ChatsPage> {
         title: Text(chat.name!),
         subtitle: Text(chat.message!),
         trailing: Text(chat.timeConverter()),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ConversationPage()));
+        },
       ));
     }
     return children;
