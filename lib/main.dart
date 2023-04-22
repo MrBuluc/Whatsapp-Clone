@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/firebase_options.dart';
 import 'package:whatsapp_clone/locator.dart';
-import 'package:whatsapp_clone/ui/home_page/home_page.dart';
+import 'package:whatsapp_clone/ui/users_page/users_page.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 
 Future main() async {
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
               primary: const Color(0xff075E54),
               secondary: const Color(0xff25D366),
             )),
-        home: const HomePage(),
+        home: const UsersPage(),
       ),
     );
   }
