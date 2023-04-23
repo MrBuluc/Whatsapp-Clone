@@ -12,4 +12,10 @@ class Message {
             message: map["message"],
             senderId: map["senderId"],
             time: map["time"]);
+
+  Map<String, dynamic> toFirestore() => {
+        if (message != null) "message": message,
+        if (senderId != null) "senderId": senderId,
+        if (time != null) "time": time
+      };
 }

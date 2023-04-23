@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
+import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late CollectionReference _conversationsRef, _usersRef;
+  late CollectionReference _conversationsRef, _usersRef, _messageRef;
 
   FirestoreService() {
     _conversationsRef = _firestore
@@ -24,4 +25,15 @@ class FirestoreService {
   Future<User?> getUser(String id) async =>
       (await _usersRef.doc(id).get().then((snapshot) => snapshot.data()))
           as User;
+
+  Stream<QuerySnapshot> messageStream(String conversationId) {
+    _messageRef = _conversationsRef
+        .doc(conversationId)
+        .collection("Messages")
+        .withConverter<Message>(
+            fromFirestore: ((snapshot, _) =>
+                Message.fromFirestore(snapshot.data()!)),
+            toFirestore: (message, _) => message.toFirestore());
+    return _messageRef.orderBy("time").snapshots();
+  }
 }

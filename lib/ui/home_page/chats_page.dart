@@ -54,7 +54,9 @@ class _ChatsPageState extends State<ChatsPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ConversationPage()));
+                  builder: (context) => ConversationPage(
+                        conversationId: conversation.id!,
+                      )));
         },
       ));
     }

@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:whatsapp_clone/locator.dart';
+import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/repository/user_repository.dart';
 
@@ -11,7 +12,6 @@ class UserModel with ChangeNotifier {
 
   Stream<QuerySnapshot> conversationsStreamMembersContains() {
     try {
-      print("user.id: ${user!.id!}");
       return _userRepository.conversationsStreamMembersContains(user!.id!);
     } catch (e) {
       printError("conversationsStreamMembersContains", e);
@@ -25,6 +25,25 @@ class UserModel with ChangeNotifier {
       return user;
     } catch (e) {
       printError("getUser", e);
+      rethrow;
+    }
+  }
+
+  Stream<QuerySnapshot> messageStream(String conversationId) {
+    try {
+      return _userRepository.messageStream(conversationId);
+    } catch (e) {
+      printError("messageStream", e);
+      rethrow;
+    }
+  }
+
+  Future<bool> sendMessage(String conversationId, String message) async {
+    try {
+      return await _userRepository.sendMessage(
+          conversationId, Message(message: message, senderId: user!.id!));
+    } catch (e) {
+      printError("sendMessage", e);
       rethrow;
     }
   }
