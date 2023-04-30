@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore, initialize_app
 import uvicorn
 from models import Message
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 
 app = FastAPI()
@@ -22,6 +22,12 @@ def send_message(conversation_id, body: str = Body()):
     add(f"{conversation_path}/{conversation_id}/Messages", message.to_dict())
     update(conversation_path, conversation_id, {
            u'displayMessage': message.message, u'time': message.time})
+
+
+@app.get("/time-now")
+def get_time_now():
+    return {"millisec_from_epoch": int((datetime.utcnow() + timedelta(hours=3) -
+                                        datetime(1970, 1, 1)).total_seconds() * 1000)}
 
 
 def add(coll_path, doc_dict):
