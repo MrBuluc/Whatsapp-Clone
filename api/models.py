@@ -3,6 +3,7 @@ class Message(object):
         self.message = None
         self.sender_id = None
         self.time = None
+        self.media = None
 
     @staticmethod
     def from_dict(source):
@@ -14,7 +15,8 @@ class Message(object):
             message.sender_id = source[u'senderId']
         if u'time' in source:
             message.time = source[u'time']
-
+        if u'media' in source:
+            message.media = source[u'media']
         return message
 
     def to_dict(self):
@@ -26,5 +28,6 @@ class Message(object):
             dest[u'senderId'] = self.sender_id
         if self.time:
             dest[u'time'] = self.time
-
+        if self.media:
+            dest[u'media'] = self.media
         return dest

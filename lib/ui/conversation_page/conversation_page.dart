@@ -1,6 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/ui/const.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
@@ -8,8 +13,8 @@ import 'package:whatsapp_clone/widgets/center_text.dart';
 import 'package:whatsapp_clone/widgets/progress_elevated_button.dart';
 
 class ConversationPage extends StatefulWidget {
-  final String conversationId;
-  const ConversationPage({Key? key, required this.conversationId})
+  final Conversation conversation;
+  const ConversationPage({Key? key, required this.conversation})
       : super(key: key);
 
   @override
@@ -23,7 +28,17 @@ class _ConversationPageState extends State<ConversationPage> {
 
   ScrollController scrollController = ScrollController();
 
-  late StateSetter sendButtonState;
+  late StateSetter sendButtonState, mediaState;
+
+  late Conversation conversation;
+
+  String chosenMedia = "";
+
+  @override
+  void initState() {
+    super.initState();
+    conversation = widget.conversation;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,30 +46,28 @@ class _ConversationPageState extends State<ConversationPage> {
       appBar: AppBar(
         titleSpacing: -5,
         title: Row(
-          children: const [
+          children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(
-                  "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/128009228/original/8e8ad34b012b46ebd403bd4157f8fef6bb2c076b/design-minimalist-flat-cartoon-caricature-avatar-in-6-hours.jpg"),
+              backgroundImage: NetworkImage(conversation.getProfileImage()),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Text("data"),
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(conversation.name!),
             )
           ],
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(
-                    "https://i.pinimg.com/originals/52/e5/6f/52e56fb927b170294ccc035f02c6477d.jpg"))),
+                image: NetworkImage(conversation.getWallpaperUrl()))),
         child: Column(
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                   stream: Provider.of<UserModel>(context, listen: false)
-                      .messageStream(widget.conversationId),
+                      .messageStream(conversation.id!),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return const CenterText(text: "Something went wrong");
@@ -72,11 +85,47 @@ class _ConversationPageState extends State<ConversationPage> {
                     );
                   }),
             ),
+            StatefulBuilder(
+                builder: (BuildContext context, StateSetter mediaStateSetter) {
+              mediaState = mediaStateSetter;
+              return chosenMedia.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Stack(
+                          children: [
+                            SizedBox(
+                              height: 100,
+                              width: 100,
+                              child: Image.file(File(chosenMedia)),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.only(left: 70),
+                                child: GestureDetector(
+                                  child: const Icon(
+                                    Icons.clear,
+                                    color: Colors.red,
+                                    size: 28,
+                                  ),
+                                  onTap: () {
+                                    mediaState(() {
+                                      chosenMedia = "";
+                                    });
+                                  },
+                                ))
+                          ],
+                        ),
+                      ),
+                    )
+                  : Container();
+            }),
             Row(
               children: [
                 Expanded(
                     child: Container(
                   margin: const EdgeInsets.all(5),
+                  height: 40,
                   decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.horizontal(
@@ -95,19 +144,25 @@ class _ConversationPageState extends State<ConversationPage> {
                           ),
                         ),
                       ),
-                      const InkWell(
-                        child: Icon(
+                      InkWell(
+                        child: const Icon(
                           Icons.attach_file,
                           color: Colors.grey,
                         ),
+                        onTap: () {
+                          chooseMedia(ImageSource.gallery);
+                        },
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(8),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
                         child: InkWell(
-                          child: Icon(
+                          child: const Icon(
                             Icons.camera_alt,
                             color: Colors.grey,
                           ),
+                          onTap: () {
+                            chooseMedia(ImageSource.camera);
+                          },
                         ),
                       )
                     ],
@@ -117,13 +172,13 @@ class _ConversationPageState extends State<ConversationPage> {
                     builder: (BuildContext context, StateSetter buttonState) {
                   sendButtonState = buttonState;
                   return Container(
-                    margin: EdgeInsets.only(right: 5),
+                    margin: const EdgeInsets.only(right: 5),
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Theme.of(context).primaryColor),
                     child: ProgressElevatedButton(
                       isProgress: isProgress,
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.send,
                         color: Colors.white,
                       ),
@@ -150,24 +205,55 @@ class _ConversationPageState extends State<ConversationPage> {
     for (Message message in messages) {
       children.add(ListTile(
         title: Align(
-          alignment: message.senderId! !=
-                  Provider.of<UserModel>(context, listen: false).user!.id!
-              ? Alignment.centerLeft
-              : Alignment.centerRight,
-          child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: const BorderRadius.horizontal(
-                      left: Radius.circular(10), right: Radius.circular(10))),
-              child: Text(
-                message.message!,
-                style: const TextStyle(color: Colors.white),
-              )),
+          alignment: Alignment.bottomRight,
+          child: message.media != null && message.media!.isNotEmpty
+              ? SizedBox(
+                  height: 200,
+                  child: Image.network(message.media!),
+                )
+              : Container(),
         ),
+        subtitle: message.message != null
+            ? Align(
+                alignment:
+                    Provider.of<UserModel>(context, listen: false).user!.id! ==
+                            message.senderId
+                        ? Alignment.centerRight
+                        : Alignment.bottomLeft,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(10),
+                          right: Radius.circular(10))),
+                  child: Text(
+                    message.message!,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              )
+            : null,
       ));
     }
     return children;
+  }
+
+  Future chooseMedia(ImageSource imageSource) async {
+    try {
+      String? chosenMediaPath =
+          await Provider.of<UserModel>(context, listen: false)
+              .chooseMedia(imageSource);
+      if (chosenMediaPath != null) {
+        mediaState(() {
+          chosenMedia = chosenMediaPath;
+        });
+      } else {
+        showSnackBar(context, "Media not selected 😕", error: true);
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString(), error: true);
+    }
   }
 
   Future sendMessage() async {
@@ -178,7 +264,7 @@ class _ConversationPageState extends State<ConversationPage> {
     FocusManager.instance.primaryFocus?.unfocus();
     try {
       await Provider.of<UserModel>(context, listen: false)
-          .sendMessage(widget.conversationId, controller.text);
+          .sendMessage(conversation.id!, controller.text, chosenMedia);
       controller.text = "";
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
@@ -186,6 +272,10 @@ class _ConversationPageState extends State<ConversationPage> {
 
     sendButtonState(() {
       isProgress = false;
+    });
+
+    mediaState(() {
+      chosenMedia = "";
     });
 
     scrollController.jumpTo(scrollController.position.maxScrollExtent);

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
@@ -16,12 +15,12 @@ class ChatsPage extends StatefulWidget {
 class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Provider.of<UserModel>(context, listen: false)
-          .conversationsStreamMembersContains(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+    return StreamBuilder<List<Conversation>>(
+      stream: Provider.of<UserModel>(context, listen: false).getConversations(),
+      builder:
+          (BuildContext context, AsyncSnapshot<List<Conversation>> snapshot) {
         if (snapshot.hasError) {
-          return const CenterText(text: "Something went wrong");
+          return CenterText(text: snapshot.error.toString());
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -35,19 +34,16 @@ class _ChatsPageState extends State<ChatsPage> {
     );
   }
 
-  List<ListTile> buildListView(AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-    List<Conversation> conversations = snapshot.data!.docs
-        .map((DocumentSnapshot document) => document.data()! as Conversation)
-        .toList();
+  List<ListTile> buildListView(AsyncSnapshot<List<Conversation>> snapshot) {
+    List<Conversation> conversations = snapshot.data!;
 
     List<ListTile> children = [];
     for (Conversation conversation in conversations) {
       children.add(ListTile(
-        leading: const CircleAvatar(
-          backgroundImage: NetworkImage(
-              "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/128009228/original/8e8ad34b012b46ebd403bd4157f8fef6bb2c076b/design-minimalist-flat-cartoon-caricature-avatar-in-6-hours.jpg"),
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(conversation.getProfileImage()),
         ),
-        title: const Text("Reyhan"),
+        title: Text(conversation.name!),
         subtitle: Text(conversation.displayMessage!),
         trailing: Text(conversation.timeConverter()),
         onTap: () {
@@ -55,7 +51,7 @@ class _ChatsPageState extends State<ChatsPage> {
               context,
               MaterialPageRoute(
                   builder: (context) => ConversationPage(
-                        conversationId: conversation.id!,
+                        conversation: conversation,
                       )));
         },
       ));

@@ -20,6 +20,8 @@ class User {
             pictureUrl: map["pictureUrl"],
             conversationsPictureUrl: map["conversationsPictureUrl"]);
 
+  String get username => "${name!} ${surname!}";
+
   Map<String, dynamic> toFirestore() => {
         if (id != null) "id": id,
         if (name != null) "name": name,

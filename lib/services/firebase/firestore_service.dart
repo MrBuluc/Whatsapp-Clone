@@ -11,16 +11,33 @@ class FirestoreService {
     _conversationsRef = _firestore
         .collection("Conversations")
         .withConverter<Conversation>(
-            fromFirestore: (snapshot, _) =>
-                Conversation.fromFirestore(snapshot.data()!),
-            toFirestore: (chat, _) => {});
+            fromFirestore: ((snapshot, _) =>
+                Conversation.fromFirestore(snapshot.data()!)),
+            toFirestore: (conversation, _) => {});
     _usersRef = _firestore.collection("Users").withConverter<User>(
         fromFirestore: ((snapshot, _) => User.fromFirestore(snapshot.data()!)),
         toFirestore: (user, _) => user.toFirestore());
   }
 
-  Stream<QuerySnapshot> conversationsStreamMembersContains(String userId) =>
-      _conversationsRef.where("members", arrayContains: userId).snapshots();
+  Stream<List<Conversation>> getConversations(String userId) =>
+      _conversationsRef
+          .where("members", arrayContains: userId)
+          .snapshots()
+          .asyncMap((QuerySnapshot conversationSnapshot) async {
+        List<Conversation> conversations = [];
+        for (QueryDocumentSnapshot queryDocumentSnapshot
+            in conversationSnapshot.docs) {
+          Conversation conversation =
+              queryDocumentSnapshot.data()! as Conversation;
+          User otherUser = (await getUser(
+              conversation.members!.firstWhere((member) => member != userId)))!;
+          conversation.name = otherUser.username;
+          conversation.profileImage = otherUser.pictureUrl;
+          conversation.wallpaperUrl = otherUser.conversationsPictureUrl;
+          conversations.add(conversation);
+        }
+        return conversations;
+      });
 
   Future<User?> getUser(String id) async =>
       (await _usersRef.doc(id).get().then((snapshot) => snapshot.data()))
