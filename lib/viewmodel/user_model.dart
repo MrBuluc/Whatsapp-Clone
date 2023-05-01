@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_print
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +7,8 @@ import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/repository/user_repository.dart';
 
+import '../ui/const.dart';
+
 class UserModel with ChangeNotifier {
   final UserRepository _userRepository = locator<UserRepository>();
   User? user;
@@ -16,7 +17,7 @@ class UserModel with ChangeNotifier {
     try {
       return _userRepository.getConversations(user!.id!);
     } catch (e) {
-      printError("conversationsStreamMembersContains", e);
+      classPrintError("conversationsStreamMembersContains", e);
       rethrow;
     }
   }
@@ -30,7 +31,23 @@ class UserModel with ChangeNotifier {
       }
       return localUser;
     } catch (e) {
-      printError("getUser", e);
+      classPrintError("getUser", e);
+      rethrow;
+    }
+  }
+
+  Future<bool> updateUser(User updatedUser, String picturePath,
+      String conversationPicturePath) async {
+    try {
+      User? resultUser = await _userRepository.updateUser(
+          updatedUser, picturePath, conversationPicturePath);
+      if (resultUser != null) {
+        user = resultUser;
+        return true;
+      }
+      return false;
+    } catch (e) {
+      classPrintError("updateUser", e);
       rethrow;
     }
   }
@@ -39,7 +56,7 @@ class UserModel with ChangeNotifier {
     try {
       return _userRepository.messageStream(conversationId);
     } catch (e) {
-      printError("messageStream", e);
+      classPrintError("messageStream", e);
       rethrow;
     }
   }
@@ -50,7 +67,7 @@ class UserModel with ChangeNotifier {
       return await _userRepository.sendMessage(conversationId,
           Message(message: message, senderId: user!.id!), chosenMedia);
     } catch (e) {
-      printError("sendMessage", e);
+      classPrintError("sendMessage", e);
       rethrow;
     }
   }
@@ -59,7 +76,7 @@ class UserModel with ChangeNotifier {
     try {
       return await _userRepository.uploadMedia(conversationId, mediaPath);
     } catch (e) {
-      printError("uploadMedia", e);
+      classPrintError("uploadMedia", e);
       rethrow;
     }
   }
@@ -68,12 +85,12 @@ class UserModel with ChangeNotifier {
     try {
       return await _userRepository.chooseMedia(imageSource);
     } catch (e) {
-      printError("chooseMedia", e);
+      classPrintError("chooseMedia", e);
       rethrow;
     }
   }
 
-  printError(String methodName, Object e) {
-    print("Usermodel $methodName hata: $e");
+  classPrintError(String methodName, Object e) {
+    printError("UserModel", methodName, e);
   }
 }

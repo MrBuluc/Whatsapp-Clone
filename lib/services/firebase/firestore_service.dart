@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/model/user.dart';
+import 'package:whatsapp_clone/ui/const.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -43,6 +44,16 @@ class FirestoreService {
       (await _usersRef.doc(id).get().then((snapshot) => snapshot.data()))
           as User;
 
+  Future<bool> updateUser(String id, Map<String, dynamic> userMap) async {
+    try {
+      await _usersRef.doc(id).update(userMap);
+      return true;
+    } catch (e) {
+      classPrintError("updateUser", e);
+      rethrow;
+    }
+  }
+
   Stream<QuerySnapshot> messageStream(String conversationId) {
     _messageRef = _conversationsRef
         .doc(conversationId)
@@ -52,5 +63,9 @@ class FirestoreService {
                 Message.fromFirestore(snapshot.data()!)),
             toFirestore: (message, _) => message.toFirestore());
     return _messageRef.orderBy("time").snapshots();
+  }
+
+  classPrintError(String methodName, Object e) {
+    printError("Firestore", methodName, e);
   }
 }
