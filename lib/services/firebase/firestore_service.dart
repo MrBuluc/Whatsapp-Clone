@@ -34,7 +34,6 @@ class FirestoreService {
               conversation.members!.firstWhere((member) => member != userId)))!;
           conversation.name = otherUser.username;
           conversation.profileImage = otherUser.pictureUrl;
-          conversation.wallpaperUrl = otherUser.conversationsPictureUrl;
           conversations.add(conversation);
         }
         return conversations;

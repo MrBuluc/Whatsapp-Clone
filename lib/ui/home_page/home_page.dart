@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/ui/const.dart';
 import 'package:whatsapp_clone/ui/home_page/camera_page.dart';
 import 'package:whatsapp_clone/ui/home_page/chats_page.dart';
+import 'package:whatsapp_clone/ui/profile_page/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,6 +16,8 @@ class _HomePageState extends State<HomePage>
   late TabController tabController;
 
   bool showMessage = true;
+
+  List<CustomPopupMenu> choices = [CustomPopupMenu(index: 0, title: "Proifle")];
 
   @override
   void initState() {
@@ -40,9 +44,22 @@ class _HomePageState extends State<HomePage>
           child: NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) => [
-              const SliverAppBar(
+              SliverAppBar(
                 floating: true,
-                title: Text("Whatsapp Clone"),
+                title: const Text("Whatsapp Clone"),
+                actions: [
+                  PopupMenuButton<CustomPopupMenu>(
+                    elevation: 3.2,
+                    onSelected: selectChoice,
+                    itemBuilder: (BuildContext context) => choices
+                        .map((CustomPopupMenu choice) =>
+                            PopupMenuItem<CustomPopupMenu>(
+                              value: choice,
+                              child: Text(choice.title),
+                            ))
+                        .toList(),
+                  )
+                ],
               )
             ],
             body: Column(
@@ -74,4 +91,17 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+
+  selectChoice(CustomPopupMenu choice) {
+    if (choice.index == 0) {
+      goToPage(context, const ProfilePage());
+    }
+  }
+}
+
+class CustomPopupMenu {
+  int index;
+  String title;
+
+  CustomPopupMenu({required this.index, required this.title});
 }

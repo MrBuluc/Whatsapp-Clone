@@ -61,7 +61,10 @@ class _ConversationPageState extends State<ConversationPage> {
         decoration: BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(conversation.getWallpaperUrl()))),
+                image: NetworkImage(
+                    Provider.of<UserModel>(context, listen: false)
+                        .user!
+                        .getConversationsPictureUrl()))),
         child: Column(
           children: [
             Expanded(

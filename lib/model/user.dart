@@ -22,6 +22,10 @@ class User {
 
   String get username => "${name!} ${surname!}";
 
+  String getConversationsPictureUrl() => conversationsPictureUrl == null
+      ? "https://i.pinimg.com/originals/52/e5/6f/52e56fb927b170294ccc035f02c6477d.jpg"
+      : conversationsPictureUrl!;
+
   Map<String, dynamic> toFirestore() => {
         if (id != null) "id": id,
         if (name != null) "name": name,

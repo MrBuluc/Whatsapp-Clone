@@ -5,12 +5,14 @@ class ProgressElevatedButton extends StatefulWidget {
   final bool isProgress;
   final String? text;
   final Icon? icon;
+  final Color? backgroundColor;
   final void Function() onPressed;
   const ProgressElevatedButton(
       {Key? key,
       required this.isProgress,
       this.text,
       this.icon,
+      this.backgroundColor,
       required this.onPressed})
       : super(key: key);
 
@@ -23,6 +25,8 @@ class _ProgressElevatedButtonState extends State<ProgressElevatedButton> {
   Widget build(BuildContext context) {
     return widget.icon == null
         ? ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: widget.backgroundColor),
             child: widget.isProgress
                 ? const CircularProgressIndicator()
                 : Text(
