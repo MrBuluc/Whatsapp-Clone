@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class Picture extends StatefulWidget {
@@ -28,13 +30,16 @@ class _PictureState extends State<Picture> {
                     image: AssetImage("assets/profile_picture.png"),
                     fit: BoxFit.cover)),
           )
-        : Image.network(
-            widget.imgUrl!,
-            width: widget.width,
-            height: widget.height,
-            fit: BoxFit.cover,
-            loadingBuilder: imageLoadingBuilder,
-          );
+        : widget.imgUrl!.contains("https")
+            ? Image.network(
+                widget.imgUrl!,
+                width: widget.width,
+                height: widget.height,
+                fit: BoxFit.cover,
+                loadingBuilder: imageLoadingBuilder,
+              )
+            : Image.file(File(widget.imgUrl!),
+                width: widget.width, height: widget.height, fit: BoxFit.cover);
   }
 
   Widget imageLoadingBuilder(BuildContext context, Widget child,

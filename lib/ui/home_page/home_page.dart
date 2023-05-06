@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage>
 
   bool showMessage = true;
 
-  List<CustomPopupMenu> choices = [CustomPopupMenu(index: 0, title: "Proifle")];
+  List<CustomPopupMenu> choices = [CustomPopupMenu(index: 0, title: "Profile")];
 
   @override
   void initState() {

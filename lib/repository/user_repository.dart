@@ -21,24 +21,9 @@ class UserRepository {
 
   Future<User?> getUser(String id) async => await _firestoreService.getUser(id);
 
-  Future<User?> updateUser(User updatedUser, String picturePath,
-      String conversationPicturePath) async {
-    String? pictureUrl, conversationPictureUrl;
-
-    if (picturePath.isNotEmpty) {
-      pictureUrl = await uploadFile(
-          "Users", updatedUser.id!, "picture.png", picturePath);
-    }
-    if (conversationPicturePath.isNotEmpty) {
-      conversationPictureUrl = await uploadFile("Users", updatedUser.id!,
-          "conversationPicture.png", conversationPicturePath);
-    }
-
-    updatedUser.pictureUrl = pictureUrl;
-    updatedUser.conversationsPictureUrl = conversationPictureUrl;
-
-    bool result = await _firestoreService.updateUser(
-        updatedUser.id!, updatedUser.toFirestore());
+  Future<User?> updateUser(String id, User updatedUser) async {
+    bool result =
+        await _firestoreService.updateUser(id, updatedUser.toFirestore());
     if (result) {
       return updatedUser;
     }
@@ -67,6 +52,16 @@ class UserRepository {
           conversationId,
           "${await getCurrentTimeFromEpoch()}.${mediaPath.split(".").last}",
           mediaPath);
+
+  Future<String> uploadProfilePicture(
+          String userId, String profilePicturePath) async =>
+      await uploadFile(
+          "Users", userId, "profilePicture.jpg", profilePicturePath);
+
+  Future<String> uploadConversationPicture(
+          String userId, String conversationPicturePath) async =>
+      uploadFile(
+          "Users", userId, "conversationPicture.jpg", conversationPicturePath);
 
   Future<String?> chooseMedia(ImageSource imageSource) async {
     XFile? pickedFile = await ImagePicker().pickImage(source: imageSource);

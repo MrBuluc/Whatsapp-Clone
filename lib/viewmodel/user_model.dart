@@ -36,12 +36,12 @@ class UserModel with ChangeNotifier {
     }
   }
 
-  Future<bool> updateUser(User updatedUser, String picturePath,
-      String conversationPicturePath) async {
+  Future<bool> updateUser(User updatedUser) async {
     try {
-      User? resultUser = await _userRepository.updateUser(
-          updatedUser, picturePath, conversationPicturePath);
+      User? resultUser =
+          await _userRepository.updateUser(user!.id!, updatedUser);
       if (resultUser != null) {
+        resultUser.id = user!.id;
         user = resultUser;
         return true;
       }
@@ -77,6 +77,27 @@ class UserModel with ChangeNotifier {
       return await _userRepository.uploadMedia(conversationId, mediaPath);
     } catch (e) {
       classPrintError("uploadMedia", e);
+      rethrow;
+    }
+  }
+
+  Future<String> uploadProfilePicture(String profilePicturePath) async {
+    try {
+      return await _userRepository.uploadProfilePicture(
+          user!.id!, profilePicturePath);
+    } catch (e) {
+      classPrintError("uploadProfilePicture", e);
+      rethrow;
+    }
+  }
+
+  Future<String> uploadConversationPicture(
+      String conversationPicturePath) async {
+    try {
+      return await _userRepository.uploadConversationPicture(
+          user!.id!, conversationPicturePath);
+    } catch (e) {
+      classPrintError("uploadConversationPicture", e);
       rethrow;
     }
   }

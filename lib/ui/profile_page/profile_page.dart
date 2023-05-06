@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/services/validator.dart';
+import 'package:whatsapp_clone/ui/const.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 import 'package:whatsapp_clone/widgets/picture.dart';
 import 'package:whatsapp_clone/widgets/progress_elevated_button.dart';
@@ -21,9 +24,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool changed = false, isProgress = false;
 
-  String picturePath = "", conversationPicturePath = "";
+  late String? picturePath, conversationPicturePath;
 
   late User user;
+
+  late StateSetter pictureState, conversationPictureState, saveButtonState;
 
   @override
   void initState() {
@@ -35,6 +40,8 @@ class _ProfilePageState extends State<ProfilePage> {
   currentUser() {
     nameCnt.text = user.name!;
     surnameCnt.text = user.surname!;
+    picturePath = user.pictureUrl;
+    conversationPicturePath = user.getConversationsPictureUrl();
   }
 
   @override
@@ -49,6 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return SafeArea(
         child: Scaffold(
       backgroundColor: Theme.of(context).primaryColorDark,
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.only(top: 10),
         child: Column(
@@ -58,20 +66,34 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  GestureDetector(
-                    child: Picture(
-                      imgUrl: user.pictureUrl,
-                      height: 150,
-                      width: 150,
-                    ),
-                  ),
-                  GestureDetector(
-                    child: Picture(
-                      imgUrl: user.getConversationsPictureUrl(),
-                      height: 200,
-                      width: 150,
-                    ),
-                  )
+                  StatefulBuilder(builder:
+                      (BuildContext context, StateSetter pictureStateSetter) {
+                    pictureState = pictureStateSetter;
+                    return GestureDetector(
+                      child: Picture(
+                        imgUrl: picturePath,
+                        height: 150,
+                        width: 150,
+                      ),
+                      onTap: () {
+                        chooseImage(0);
+                      },
+                    );
+                  }),
+                  StatefulBuilder(
+                      builder: (BuildContext context, StateSetter stateSetter) {
+                    conversationPictureState = stateSetter;
+                    return GestureDetector(
+                      child: Picture(
+                        imgUrl: conversationPicturePath,
+                        height: 200,
+                        width: 150,
+                      ),
+                      onTap: () {
+                        chooseImage(1);
+                      },
+                    );
+                  })
                 ],
               ),
             ),
@@ -100,20 +122,28 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         buildTextFormField(nameCnt, "Name"),
                         buildTextFormField(surnameCnt, "Surname"),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * .65,
-                            child: ProgressElevatedButton(
-                              isProgress: isProgress,
-                              text: "Save Profile Information",
-                              backgroundColor: changed
-                                  ? Theme.of(context).primaryColorDark
-                                  : Theme.of(context).focusColor,
-                              onPressed: () {},
+                        StatefulBuilder(builder:
+                            (BuildContext context, StateSetter stateSetter) {
+                          saveButtonState = stateSetter;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * .65,
+                              child: ProgressElevatedButton(
+                                isProgress: isProgress,
+                                text: "Save Profile Information",
+                                backgroundColor: changed
+                                    ? Theme.of(context).primaryColorDark
+                                    : Theme.of(context).focusColor,
+                                onPressed: () {
+                                  if (changed) {
+                                    saveInformation();
+                                  }
+                                },
+                              ),
                             ),
-                          ),
-                        )
+                          );
+                        })
                       ],
                     ),
                   ),
@@ -124,6 +154,32 @@ class _ProfilePageState extends State<ProfilePage> {
     ));
   }
 
+  Future chooseImage(int mode) async {
+    try {
+      String? chosenImagePath =
+          await Provider.of<UserModel>(context, listen: false)
+              .chooseMedia(ImageSource.gallery);
+      if (chosenImagePath != null) {
+        if (mode == 0) {
+          pictureState(() {
+            picturePath = chosenImagePath;
+          });
+        } else {
+          conversationPictureState(() {
+            conversationPicturePath = chosenImagePath;
+          });
+        }
+        saveButtonState(() {
+          changed = true;
+        });
+      } else {
+        showSnackBar(context, "Media not selected 😕", error: true);
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString(), error: true);
+    }
+  }
+
   Widget buildTextFormField(TextEditingController controller, String label,
           {double top = 0}) =>
       Container(
@@ -131,9 +187,49 @@ class _ProfilePageState extends State<ProfilePage> {
         child: TextFormField(
           controller: controller,
           decoration: InputDecoration(
-              labelText: label, prefixIcon: Icon(Icons.perm_identity)),
+              labelText: label, prefixIcon: const Icon(Icons.perm_identity)),
           validator: (String? value) => Validator.textControl(value, label),
-          onChanged: (String value) => changed = true,
+          onChanged: (String value) => saveButtonState(() {
+            changed = true;
+          }),
         ),
       );
+
+  Future saveInformation() async {
+    if (formKey.currentState!.validate()) {
+      saveButtonState(() {
+        isProgress = true;
+      });
+
+      try {
+        User updatedUser = User();
+        UserModel userModel = Provider.of<UserModel>(context, listen: false);
+
+        if (picturePath != user.pictureUrl) {
+          updatedUser.pictureUrl =
+              await userModel.uploadProfilePicture(picturePath!);
+        }
+        if (conversationPicturePath != user.getConversationsPictureUrl()) {
+          updatedUser.conversationsPictureUrl = await userModel
+              .uploadConversationPicture(conversationPicturePath!);
+        }
+
+        updatedUser.name = nameCnt.text;
+        updatedUser.surname = surnameCnt.text;
+
+        bool result = await userModel.updateUser(updatedUser);
+        if (result) {
+          showSnackBar(context, "Profile info has been successfully updated");
+        }
+      } catch (e) {
+        showSnackBar(context, e.toString(), error: true);
+      }
+
+      saveButtonState(() {
+        isProgress = false;
+      });
+    } else {
+      showSnackBar(context, "Enter the valid values", error: true);
+    }
+  }
 }

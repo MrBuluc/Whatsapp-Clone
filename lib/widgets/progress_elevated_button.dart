@@ -28,7 +28,9 @@ class _ProgressElevatedButtonState extends State<ProgressElevatedButton> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: widget.backgroundColor),
             child: widget.isProgress
-                ? const CircularProgressIndicator()
+                ? const CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  )
                 : Text(
                     widget.text!,
                     style: textStyle,
