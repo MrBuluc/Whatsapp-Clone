@@ -63,15 +63,14 @@ class _UsersPageState extends State<UsersPage> {
     });
 
     try {
-      await Provider.of<UserModel>(context, listen: false)
-          .getUser(userId, false);
+      UserModel userModel = Provider.of<UserModel>(context, listen: false);
+      await userModel.getUser(userId, false);
 
       setState(() {
         isProgress = false;
       });
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const HomePage()));
+      userModel.navigateTo(context, const HomePage());
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
     }

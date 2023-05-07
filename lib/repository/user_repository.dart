@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whatsapp_clone/locator.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
@@ -7,6 +8,7 @@ import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
 import 'package:whatsapp_clone/services/firebase/firestore_service.dart';
 import 'package:whatsapp_clone/services/firebase/storage_service.dart';
+import 'package:whatsapp_clone/services/navigator_service.dart';
 import 'package:whatsapp_clone/ui/const.dart';
 
 import '../model/user.dart';
@@ -14,6 +16,7 @@ import '../model/user.dart';
 class UserRepository {
   final FirestoreService _firestoreService = locator<FirestoreService>();
   final StorageService _storageService = locator<StorageService>();
+  final NavigatorService _navigatorService = locator<NavigatorService>();
   final MessageApi _messageApi = locator<MessageApi>();
   final TimeApi _timeApi = locator<TimeApi>();
 
@@ -85,4 +88,7 @@ class UserRepository {
 
   Future<String> getCurrentTimeFromEpoch() async =>
       _timeApi.getCurrentTimeFromEpoch();
+
+  Future navigateTo(BuildContext context, Widget page) =>
+      _navigatorService.navigateTo(context, page);
 }

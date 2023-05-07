@@ -125,6 +125,15 @@ class UserModel with ChangeNotifier {
     }
   }
 
+  Future navigateTo(BuildContext context, Widget page) {
+    try {
+      return _userRepository.navigateTo(context, page);
+    } catch (e) {
+      classPrintError("navigateTo", e);
+      rethrow;
+    }
+  }
+
   classPrintError(String methodName, Object e) {
     printError("UserModel", methodName, e);
   }

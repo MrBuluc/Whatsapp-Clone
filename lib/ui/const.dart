@@ -21,7 +21,3 @@ showSnackBar(BuildContext context, String content, {bool error = false}) {
 printError(String className, String methodName, Object e) {
   print("$className $methodName hata: ${e.toString()}");
 }
-
-goToPage(BuildContext context, Widget page) {
-  Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
-}

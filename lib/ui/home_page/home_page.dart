@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:whatsapp_clone/ui/const.dart';
+import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/ui/home_page/camera_page.dart';
 import 'package:whatsapp_clone/ui/home_page/chats_page.dart';
 import 'package:whatsapp_clone/ui/profile_page/profile_page.dart';
+import 'package:whatsapp_clone/viewmodel/user_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -94,7 +95,8 @@ class _HomePageState extends State<HomePage>
 
   selectChoice(CustomPopupMenu choice) {
     if (choice.index == 0) {
-      goToPage(context, const ProfilePage());
+      Provider.of<UserModel>(context, listen: false)
+          .navigateTo(context, const ProfilePage());
     }
   }
 }

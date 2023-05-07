@@ -47,12 +47,11 @@ class _ChatsPageState extends State<ChatsPage> {
         subtitle: Text(conversation.displayMessage!),
         trailing: Text(conversation.timeConverter()),
         onTap: () {
-          Navigator.push(
+          Provider.of<UserModel>(context, listen: false).navigateTo(
               context,
-              MaterialPageRoute(
-                  builder: (context) => ConversationPage(
-                        conversation: conversation,
-                      )));
+              ConversationPage(
+                conversation: conversation,
+              ));
         },
       ));
     }
