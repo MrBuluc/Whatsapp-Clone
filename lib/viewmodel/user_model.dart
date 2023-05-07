@@ -52,6 +52,20 @@ class UserModel with ChangeNotifier {
     }
   }
 
+  Future<bool> deleteUserFileField(String fileName, String fieldName) async {
+    try {
+      bool result = await _userRepository.deleteUserFileField(
+          user!.id!, fileName, fieldName);
+      if (result) {
+        getUser(user!.id!, false);
+      }
+      return result;
+    } catch (e) {
+      classPrintError("deleteUserPictureUrl", e);
+      rethrow;
+    }
+  }
+
   Stream<QuerySnapshot> messageStream(String conversationId) {
     try {
       return _userRepository.messageStream(conversationId);

@@ -1,3 +1,5 @@
+import 'package:whatsapp_clone/ui/const.dart';
+
 class User {
   String? id;
   String? name;
@@ -17,8 +19,8 @@ class User {
             id: map["id"],
             name: map["name"],
             surname: map["surname"],
-            pictureUrl: map["pictureUrl"],
-            conversationsPictureUrl: map["conversationsPictureUrl"]);
+            pictureUrl: map[userProfilePictureFieldName],
+            conversationsPictureUrl: map[userConversationsPictureFieldName]);
 
   String get username => "${name!} ${surname!}";
 
@@ -30,8 +32,8 @@ class User {
         if (id != null) "id": id,
         if (name != null) "name": name,
         if (surname != null) "surname": surname,
-        if (pictureUrl != null) "pictureUrl": pictureUrl,
+        if (pictureUrl != null) userProfilePictureFieldName: pictureUrl,
         if (conversationsPictureUrl != null)
-          "conversationsPictureUrl": conversationsPictureUrl
+          userConversationsPictureFieldName: conversationsPictureUrl
       };
 }

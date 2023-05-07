@@ -28,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   late User user;
 
-  late StateSetter pictureState, conversationPictureState, saveButtonState;
+  late StateSetter pictureState, conversationPictureState, buttonState;
 
   @override
   void initState() {
@@ -124,26 +124,43 @@ class _ProfilePageState extends State<ProfilePage> {
                         buildTextFormField(surnameCnt, "Surname"),
                         StatefulBuilder(builder:
                             (BuildContext context, StateSetter stateSetter) {
-                          saveButtonState = stateSetter;
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * .65,
-                              child: ProgressElevatedButton(
-                                isProgress: isProgress,
-                                text: "Save Profile Information",
-                                backgroundColor: changed
-                                    ? Theme.of(context).primaryColorDark
-                                    : Theme.of(context).focusColor,
-                                onPressed: () {
-                                  if (changed) {
-                                    saveInformation();
-                                  }
-                                },
+                          buttonState = stateSetter;
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * .65,
+                                  child: ProgressElevatedButton(
+                                    isProgress: isProgress,
+                                    text: "Save Profile Information",
+                                    backgroundColor: changed
+                                        ? Theme.of(context).primaryColorDark
+                                        : Theme.of(context).focusColor,
+                                    onPressed: () {
+                                      if (changed) {
+                                        saveInformation();
+                                      }
+                                    },
+                                  ),
+                                ),
                               ),
-                            ),
+                              ProgressElevatedButton(
+                                  isProgress: isProgress,
+                                  text: "Default Profile Picture",
+                                  onPressed: () {
+                                    defaultProfileField(0);
+                                  }),
+                              ProgressElevatedButton(
+                                  isProgress: isProgress,
+                                  text: "Default Conversations Picture",
+                                  onPressed: () {
+                                    defaultProfileField(1);
+                                  })
+                            ],
                           );
-                        })
+                        }),
                       ],
                     ),
                   ),
@@ -169,7 +186,7 @@ class _ProfilePageState extends State<ProfilePage> {
             conversationPicturePath = chosenImagePath;
           });
         }
-        saveButtonState(() {
+        buttonState(() {
           changed = true;
         });
       } else {
@@ -189,7 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
           decoration: InputDecoration(
               labelText: label, prefixIcon: const Icon(Icons.perm_identity)),
           validator: (String? value) => Validator.textControl(value, label),
-          onChanged: (String value) => saveButtonState(() {
+          onChanged: (String value) => buttonState(() {
             changed = true;
           }),
         ),
@@ -197,7 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future saveInformation() async {
     if (formKey.currentState!.validate()) {
-      saveButtonState(() {
+      buttonState(() {
         isProgress = true;
       });
 
@@ -225,11 +242,47 @@ class _ProfilePageState extends State<ProfilePage> {
         showSnackBar(context, e.toString(), error: true);
       }
 
-      saveButtonState(() {
+      buttonState(() {
         isProgress = false;
       });
     } else {
       showSnackBar(context, "Enter the valid values", error: true);
     }
+  }
+
+  Future defaultProfileField(int mode) async {
+    buttonState(() {
+      isProgress = true;
+    });
+
+    try {
+      late String fileName, fieldName;
+      if (mode == 0) {
+        fileName = userProfilePictureFileName;
+        fieldName = userProfilePictureFieldName;
+      } else {
+        fileName = userConversationPictureFileName;
+        fieldName = userConversationsPictureFieldName;
+      }
+      bool result = await Provider.of<UserModel>(context, listen: false)
+          .deleteUserFileField(fileName, fieldName);
+      if (result) {
+        if (mode == 0) {
+          pictureState(() {
+            picturePath = null;
+          });
+        } else {
+          conversationPictureState(() {
+            conversationPicturePath = user.getConversationsPictureUrl();
+          });
+        }
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString(), error: true);
+    }
+
+    buttonState(() {
+      isProgress = false;
+    });
   }
 }

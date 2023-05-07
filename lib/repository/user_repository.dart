@@ -7,6 +7,7 @@ import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
 import 'package:whatsapp_clone/services/firebase/firestore_service.dart';
 import 'package:whatsapp_clone/services/firebase/storage_service.dart';
+import 'package:whatsapp_clone/ui/const.dart';
 
 import '../model/user.dart';
 
@@ -29,6 +30,19 @@ class UserRepository {
     }
     return null;
   }
+
+  Future<bool> deleteUserFileField(
+      String id, String fileName, String fieldName) async {
+    bool result = await deleteFile(usersCollectionName, id, fileName);
+    if (result) {
+      return await _firestoreService.deleteUserField(id, fieldName);
+    }
+    return result;
+  }
+
+  Future<bool> deleteFile(
+          String parentFolderName, String folderName, String fileName) async =>
+      _storageService.deleteFile(parentFolderName, folderName, fileName);
 
   Stream<QuerySnapshot> messageStream(String conversationId) =>
       _firestoreService.messageStream(conversationId);
@@ -55,13 +69,13 @@ class UserRepository {
 
   Future<String> uploadProfilePicture(
           String userId, String profilePicturePath) async =>
-      await uploadFile(
-          "Users", userId, "profilePicture.jpg", profilePicturePath);
+      await uploadFile(usersCollectionName, userId, userProfilePictureFileName,
+          profilePicturePath);
 
   Future<String> uploadConversationPicture(
           String userId, String conversationPicturePath) async =>
-      uploadFile(
-          "Users", userId, "conversationPicture.jpg", conversationPicturePath);
+      uploadFile(usersCollectionName, userId, userConversationPictureFileName,
+          conversationPicturePath);
 
   Future<String?> chooseMedia(ImageSource imageSource) async {
     XFile? pickedFile = await ImagePicker().pickImage(source: imageSource);

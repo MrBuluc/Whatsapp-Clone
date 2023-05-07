@@ -53,6 +53,11 @@ class FirestoreService {
     }
   }
 
+  Future<bool> deleteUserField(String id, String fieldName) async {
+    await _usersRef.doc(id).update({fieldName: FieldValue.delete()});
+    return true;
+  }
+
   Stream<QuerySnapshot> messageStream(String conversationId) {
     _messageRef = _conversationsRef
         .doc(conversationId)

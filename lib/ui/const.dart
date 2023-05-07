@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 
 TextStyle textStyle = const TextStyle(fontSize: 20);
 
+const String usersCollectionName = "Users",
+    userProfilePictureFileName = "profilePicture.jpg",
+    userConversationPictureFileName = "conversationPicture.jpg",
+    userProfilePictureFieldName = "pictureUrl",
+    userConversationsPictureFieldName = "conversationsPictureUrl";
+
 showSnackBar(BuildContext context, String content, {bool error = false}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     backgroundColor: error ? Colors.red : null,
