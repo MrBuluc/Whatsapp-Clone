@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:whatsapp_clone/ui/const.dart';
 
 class Conversation {
   String? id;
@@ -17,9 +18,8 @@ class Conversation {
             members: map["members"],
             time: map["time"]);
 
-  String getProfileImage() => profileImage == null
-      ? "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/128009228/original/8e8ad34b012b46ebd403bd4157f8fef6bb2c076b/design-minimalist-flat-cartoon-caricature-avatar-in-6-hours.jpg"
-      : profileImage!;
+  String getProfileImage() =>
+      profileImage == null ? defaultProfilePictureUrl : profileImage!;
 
   String timeConverter() {
     DateTime dt = time!.toDate();

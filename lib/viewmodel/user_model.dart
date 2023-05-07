@@ -125,11 +125,20 @@ class UserModel with ChangeNotifier {
     }
   }
 
-  Future navigateTo(BuildContext context, Widget page) {
+  Future<Object?> navigateTo(BuildContext context, Widget page) {
     try {
       return _userRepository.navigateTo(context, page);
     } catch (e) {
       classPrintError("navigateTo", e);
+      rethrow;
+    }
+  }
+
+  Future<List<User>> getFilteredUsers(String? query) async {
+    try {
+      return await _userRepository.getFilteredUsers(query, user!.id!);
+    } catch (e) {
+      classPrintError("getFilteredUsers", e);
       rethrow;
     }
   }

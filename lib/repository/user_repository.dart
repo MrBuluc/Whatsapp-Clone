@@ -6,6 +6,7 @@ import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
 import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
+import 'package:whatsapp_clone/services/api_services/user_api.dart';
 import 'package:whatsapp_clone/services/firebase/firestore_service.dart';
 import 'package:whatsapp_clone/services/firebase/storage_service.dart';
 import 'package:whatsapp_clone/services/navigator_service.dart';
@@ -19,6 +20,7 @@ class UserRepository {
   final NavigatorService _navigatorService = locator<NavigatorService>();
   final MessageApi _messageApi = locator<MessageApi>();
   final TimeApi _timeApi = locator<TimeApi>();
+  final UserApi _userApi = locator<UserApi>();
 
   Stream<List<Conversation>> getConversations(String userId) =>
       _firestoreService.getConversations(userId);
@@ -89,6 +91,9 @@ class UserRepository {
   Future<String> getCurrentTimeFromEpoch() async =>
       _timeApi.getCurrentTimeFromEpoch();
 
-  Future navigateTo(BuildContext context, Widget page) =>
+  Future<Object?> navigateTo(BuildContext context, Widget page) =>
       _navigatorService.navigateTo(context, page);
+
+  Future<List<User>> getFilteredUsers(String? query, String userId) async =>
+      _userApi.getFilteredUsers(query, userId);
 }

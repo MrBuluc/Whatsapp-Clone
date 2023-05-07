@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/ui/home_page/camera_page.dart';
 import 'package:whatsapp_clone/ui/home_page/chats_page.dart';
+import 'package:whatsapp_clone/ui/home_page/contacts_page.dart';
 import 'package:whatsapp_clone/ui/profile_page/profile_page.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 
@@ -36,7 +37,10 @@ class _HomePageState extends State<HomePage>
       floatingActionButton: showMessage
           ? FloatingActionButton(
               child: const Icon(Icons.message),
-              onPressed: () {},
+              onPressed: () {
+                Provider.of<UserModel>(context, listen: false)
+                    .navigateTo(context, const ContactsPage());
+              },
             )
           : null,
       body: Container(
