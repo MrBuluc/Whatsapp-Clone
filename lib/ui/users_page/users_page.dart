@@ -70,7 +70,7 @@ class _UsersPageState extends State<UsersPage> {
         isProgress = false;
       });
 
-      userModel.navigateTo(context, const HomePage());
+      userModel.navigateAndReplace(const HomePage());
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
     }

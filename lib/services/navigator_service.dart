@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NavigatorService {
-  Future<Object?> navigateTo(BuildContext context, Widget page) =>
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  Future<Object?> navigateTo(Widget page) => navigatorKey.currentState!
+      .push(MaterialPageRoute(builder: (context) => page));
+
+  Future<Object?> navigateAndReplace(Widget page) =>
+      navigatorKey.currentState!.pushReplacement(
+          MaterialPageRoute(builder: (BuildContext context) => page));
 }

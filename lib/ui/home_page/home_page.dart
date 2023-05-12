@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage>
               child: const Icon(Icons.message),
               onPressed: () {
                 Provider.of<UserModel>(context, listen: false)
-                    .navigateTo(context, const ContactsPage());
+                    .navigateTo(const ContactsPage());
               },
             )
           : null,
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage>
   selectChoice(CustomPopupMenu choice) {
     if (choice.index == 0) {
       Provider.of<UserModel>(context, listen: false)
-          .navigateTo(context, const ProfilePage());
+          .navigateTo(const ProfilePage());
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/firebase_options.dart';
 import 'package:whatsapp_clone/locator.dart';
+import 'package:whatsapp_clone/services/navigator_service.dart';
 import 'package:whatsapp_clone/ui/users_page/users_page.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
               primary: const Color(0xff075E54),
               secondary: const Color(0xff25D366),
             )),
+        navigatorKey: locator<NavigatorService>().navigatorKey,
         home: const UsersPage(),
       ),
     );

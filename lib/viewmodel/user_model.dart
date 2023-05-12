@@ -125,11 +125,20 @@ class UserModel with ChangeNotifier {
     }
   }
 
-  Future<Object?> navigateTo(BuildContext context, Widget page) {
+  Future<Object?> navigateTo(Widget page) {
     try {
-      return _userRepository.navigateTo(context, page);
+      return _userRepository.navigateTo(page);
     } catch (e) {
       classPrintError("navigateTo", e);
+      rethrow;
+    }
+  }
+
+  Future<Object?> navigateAndReplace(Widget page) {
+    try {
+      return _userRepository.navigateAndReplace(page);
+    } catch (e) {
+      classPrintError("navigateAndReplace", e);
       rethrow;
     }
   }

@@ -91,8 +91,10 @@ class UserRepository {
   Future<String> getCurrentTimeFromEpoch() async =>
       _timeApi.getCurrentTimeFromEpoch();
 
-  Future<Object?> navigateTo(BuildContext context, Widget page) =>
-      _navigatorService.navigateTo(context, page);
+  Future<Object?> navigateTo(Widget page) => _navigatorService.navigateTo(page);
+
+  Future<Object?> navigateAndReplace(Widget page) =>
+      _navigatorService.navigateAndReplace(page);
 
   Future<List<User>> getFilteredUsers(String? query, String userId) async =>
       _userApi.getFilteredUsers(query, userId);
