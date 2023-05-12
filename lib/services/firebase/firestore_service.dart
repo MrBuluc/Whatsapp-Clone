@@ -23,6 +23,7 @@ class FirestoreService {
   Stream<List<Conversation>> getConversations(String userId) =>
       _conversationsRef
           .where("members", arrayContains: userId)
+          .orderBy("time", descending: true)
           .snapshots()
           .asyncMap((QuerySnapshot conversationSnapshot) async {
         List<Conversation> conversations = [];
