@@ -6,17 +6,20 @@ class Conversation {
   String? displayMessage;
   List? members;
   Timestamp? time;
+  int? imageCount;
   String? name;
   String? profileImage;
 
-  Conversation({this.id, this.displayMessage, this.members, this.time});
+  Conversation(
+      {this.id, this.displayMessage, this.members, this.time, this.imageCount});
 
   Conversation.fromFirestore(Map<String, dynamic> map)
       : this(
             id: map["id"],
             displayMessage: map["displayMessage"],
             members: map["members"],
-            time: map["time"]);
+            time: map["time"],
+            imageCount: map["imageCount"]);
 
   String getProfileImage() =>
       profileImage == null ? defaultProfilePictureUrl : profileImage!;

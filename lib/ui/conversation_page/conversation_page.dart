@@ -34,10 +34,21 @@ class _ConversationPageState extends State<ConversationPage> {
 
   String chosenMedia = "";
 
+  FocusNode focusNode = FocusNode();
+
+  int imageHeight = 190;
+
   @override
   void initState() {
     super.initState();
     conversation = widget.conversation;
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -141,6 +152,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           padding: const EdgeInsets.only(left: 10),
                           child: TextFormField(
                             controller: controller,
+                            focusNode: focusNode,
                             decoration: const InputDecoration(
                                 hintText: "Type a message",
                                 border: InputBorder.none),
@@ -269,6 +281,9 @@ class _ConversationPageState extends State<ConversationPage> {
       await Provider.of<UserModel>(context, listen: false)
           .sendMessage(conversation.id!, controller.text, chosenMedia);
       controller.text = "";
+      if (chosenMedia.isNotEmpty) {
+        conversation.imageCount = conversation.imageCount! + 1;
+      }
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
     }
@@ -281,6 +296,12 @@ class _ConversationPageState extends State<ConversationPage> {
       chosenMedia = "";
     });
 
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    int imageCount = conversation.imageCount!;
+    if (imageCount == 0) {
+      imageCount = 1;
+      imageHeight = 80;
+    }
+    scrollController.jumpTo(
+        scrollController.position.maxScrollExtent + imageCount * imageHeight);
   }
 }

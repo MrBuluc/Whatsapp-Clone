@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Body
 from firebase_admin import credentials, firestore, initialize_app
+from google.cloud.firestore import Increment
 import uvicorn
 from models import Message, User
 import json
@@ -20,8 +21,11 @@ def send_message(conversation_id, body: str = Body()):
     message.time = datetime.now(pytz.timezone("Asia/Istanbul"))
     conversation_path = "Conversations"
     add(f"{conversation_path}/{conversation_id}/Messages", message.to_dict())
-    update(conversation_path, conversation_id, {
-           u'displayMessage': message.message, u'time': message.time})
+    conversation_update = {
+        u'displayMessage': message.message, u'time': message.time}
+    if message.media:
+        conversation_update[u"imageCount"] = Increment(1)
+    update(conversation_path, conversation_id, conversation_update)
 
 
 @app.get("/time-now")
