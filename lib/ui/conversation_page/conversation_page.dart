@@ -79,25 +79,28 @@ class _ConversationPageState extends State<ConversationPage> {
         child: Column(
           children: [
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                  stream: Provider.of<UserModel>(context, listen: false)
-                      .messageStream(conversation.id!),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return const CenterText(text: "Something went wrong");
-                    }
+              child: GestureDetector(
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: Provider.of<UserModel>(context, listen: false)
+                        .messageStream(conversation.id!),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const CenterText(text: "Something went wrong");
+                      }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      return ListView(
+                        controller: scrollController,
+                        children: buildListView(snapshot),
                       );
-                    }
-
-                    return ListView(
-                      controller: scrollController,
-                      children: buildListView(snapshot),
-                    );
-                  }),
+                    }),
+                onTap: () => focusNode.unfocus(),
+              ),
             ),
             StatefulBuilder(
                 builder: (BuildContext context, StateSetter mediaStateSetter) {
