@@ -24,6 +24,10 @@ class Conversation {
   String getProfileImage() =>
       profileImage == null ? defaultProfilePictureUrl : profileImage!;
 
+  String getDisplayMessage() => displayMessage ?? "";
+
+  int getImageCount() => imageCount ?? 0;
+
   String timeConverter() {
     DateTime dt = time!.toDate();
     Duration duration = DateTime.now().difference(dt);

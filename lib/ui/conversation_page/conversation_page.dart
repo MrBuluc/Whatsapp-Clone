@@ -285,7 +285,7 @@ class _ConversationPageState extends State<ConversationPage> {
           .sendMessage(conversation.id!, controller.text, chosenMedia);
       controller.text = "";
       if (chosenMedia.isNotEmpty) {
-        conversation.imageCount = conversation.imageCount! + 1;
+        conversation.imageCount = conversation.getImageCount() + 1;
       }
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
@@ -299,7 +299,7 @@ class _ConversationPageState extends State<ConversationPage> {
       chosenMedia = "";
     });
 
-    int imageCount = conversation.imageCount!;
+    int imageCount = conversation.getImageCount();
     if (imageCount == 0) {
       imageCount = 1;
       imageHeight = 80;

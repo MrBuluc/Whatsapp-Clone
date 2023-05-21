@@ -44,7 +44,7 @@ class _ChatsPageState extends State<ChatsPage> {
           backgroundImage: NetworkImage(conversation.getProfileImage()),
         ),
         title: Text(conversation.name!),
-        subtitle: Text(conversation.displayMessage!),
+        subtitle: Text(conversation.getDisplayMessage()),
         trailing: Text(conversation.timeConverter()),
         onTap: () {
           Provider.of<UserModel>(context, listen: false)
