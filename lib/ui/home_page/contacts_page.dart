@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/user.dart';
+import 'package:whatsapp_clone/ui/const.dart';
+import 'package:whatsapp_clone/ui/conversation_page/conversation_page.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 
 class ContactsPage extends StatelessWidget {
@@ -84,10 +87,29 @@ class ContactsList extends StatelessWidget {
                       backgroundImage: NetworkImage(user.getProfileImage()),
                     ),
                     title: Text(user.username),
+                    onTap: () {
+                      startConversation(context, user);
+                    },
                   ))
               .toList(),
         );
       },
     );
+  }
+
+  Future startConversation(BuildContext context, User user) async {
+    showSnackBar(context, "Starting Conversation Please Wait...");
+
+    try {
+      UserModel userModel = Provider.of<UserModel>(context, listen: false);
+      String conversationId = await userModel.startConversation(user.id!);
+      userModel.navigateTo(ConversationPage(
+          conversation: Conversation(
+              id: conversationId,
+              name: user.username,
+              profileImage: user.pictureUrl)));
+    } catch (e) {
+      showSnackBar(context, e.toString(), error: true);
+    }
   }
 }

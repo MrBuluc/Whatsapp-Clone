@@ -2,10 +2,9 @@ from fastapi import FastAPI, Body
 from firebase_admin import credentials, firestore, initialize_app
 from google.cloud.firestore import Increment
 import uvicorn
-from models import Message, User
+from models import Message, User, Conversation
 import json
 from datetime import datetime, timedelta
-import pytz
 
 app = FastAPI()
 
@@ -18,7 +17,6 @@ def root():
 @app.post("/send-message/{conversation_id}")
 def send_message(conversation_id, body: str = Body()):
     message = Message.from_dict(json.loads(body))
-    message.time = datetime.now(pytz.timezone("Asia/Istanbul"))
     conversation_path = "Conversations"
     add(f"{conversation_path}/{conversation_id}/Messages", message.to_dict())
     conversation_update = {
@@ -52,16 +50,44 @@ def filter_users(query: str, user_id: str):
     return filtered_users
 
 
-def add(coll_path, doc_dict):
-    firestore.client().collection(coll_path).add(doc_dict)
+@app.post("/start-conversation")
+def start_conversation(body: str = Body()):
+    members = json.loads(body)
+    conversation_id = members[0] + "-" + members[1]
+    col_path = "Conversations"
+    conversation = get(col_path, conversation_id)
+    if conversation == None:
+        conversation_id = members[1] + "-" + members[0]
+        conversation = get(col_path, conversation_id)
+        if conversation == None:
+            conversation = Conversation()
+            conversation.members = members
+            conversation_id = members[0] + "-" + members[1]
+            conversation.id = conversation_id
+            set(col_path, conversation_id, conversation.to_dict())
+    return conversation_id
 
 
-def update(coll_path, doc_id, update_fields):
-    firestore.client().collection(coll_path).document(doc_id).update(update_fields)
+def add(col_path, doc_dict):
+    #update_time, doc_ref
+    _, doc_ref = firestore.client().collection(col_path).add(doc_dict)
+    return doc_ref
+
+
+def set(col_path, doc_id, doc_dict):
+    firestore.client().collection(col_path).document(doc_id).set(doc_dict)
+
+
+def update(col_path, doc_id, update_fields):
+    firestore.client().collection(col_path).document(doc_id).update(update_fields)
 
 
 def getUsers():
     return firestore.client().collection(u"Users").stream()
+
+
+def get(col_path, doc_id):
+    return firestore.client().collection(col_path).document(doc_id).get().to_dict()
 
 
 def initialize_firebase():

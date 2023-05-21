@@ -13,6 +13,15 @@ class UserModel with ChangeNotifier {
   final UserRepository _userRepository = locator<UserRepository>();
   User? user;
 
+  Future<String> startConversation(String otherUserId) async {
+    try {
+      return await _userRepository.startConversation([user!.id!, otherUserId]);
+    } catch (e) {
+      classPrintError("startConversation", e);
+      rethrow;
+    }
+  }
+
   Stream<List<Conversation>> getConversations() {
     try {
       return _userRepository.getConversations(user!.id!);

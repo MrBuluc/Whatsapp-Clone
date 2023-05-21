@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:whatsapp_clone/locator.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
+import 'package:whatsapp_clone/services/api_services/conversation_api.dart';
 import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
 import 'package:whatsapp_clone/services/api_services/user_api.dart';
@@ -21,6 +22,10 @@ class UserRepository {
   final MessageApi _messageApi = locator<MessageApi>();
   final TimeApi _timeApi = locator<TimeApi>();
   final UserApi _userApi = locator<UserApi>();
+  final ConversationApi _conversationApi = locator<ConversationApi>();
+
+  Future<String> startConversation(List<String> members) async =>
+      await _conversationApi.startConversation(members);
 
   Stream<List<Conversation>> getConversations(String userId) =>
       _firestoreService.getConversations(userId);

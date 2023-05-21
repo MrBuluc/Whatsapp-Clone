@@ -1,8 +1,11 @@
+from datetime import datetime
+import pytz
+
 class Message(object):
     def __init__(self):
         self.message = None
         self.sender_id = None
-        self.time = None
+        self.time = datetime.now(pytz.timezone("Asia/Istanbul"))
         self.media = None
 
     @staticmethod
@@ -71,3 +74,45 @@ class User(object):
 
     def get_username(self):
         return f"{self.name} {self.surname}"
+
+
+class Conversation(object):
+    def __init__(self):
+        self.display_message = ""
+        self.id = None,
+        self.image_count = 0
+        self.members = None
+        self.time = datetime.now(pytz.timezone("Asia/Istanbul"))
+
+    @staticmethod
+    def from_dict(source):
+        conversation = Conversation()
+
+        if u"displayMessage" in source:
+            conversation.display_message = source[u"displayMessage"]
+        if u"id" in source:
+            conversation.id = source[u"id"]
+        if u"imageCount" in source:
+            conversation.image_count = source[u"imageCount"]
+        if u"members" in source:
+            conversation.members = source[u"members"]
+        if u"time" in source:
+            conversation.time = source[u"time"]
+
+        return conversation
+
+    def to_dict(self):
+        dest = {}
+
+        if self.display_message:
+            dest[u"displayMessage"] = self.display_message
+        if self.id:
+            dest[u"id"] = self.id
+        if self.image_count:
+            dest[u"imageCount"] = self.image_count
+        if self.members:
+            dest[u"members"] = self.members
+        if self.time:
+            dest[u"time"] = self.time
+
+        return dest

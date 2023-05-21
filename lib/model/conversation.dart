@@ -11,7 +11,13 @@ class Conversation {
   String? profileImage;
 
   Conversation(
-      {this.id, this.displayMessage, this.members, this.time, this.imageCount});
+      {this.id,
+      this.displayMessage,
+      this.members,
+      this.time,
+      this.imageCount,
+      this.name,
+      this.profileImage});
 
   Conversation.fromFirestore(Map<String, dynamic> map)
       : this(

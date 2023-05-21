@@ -221,9 +221,14 @@ class _ConversationPageState extends State<ConversationPage> {
 
     List<ListTile> children = [];
     for (Message message in messages) {
+      AlignmentGeometry alignment =
+          Provider.of<UserModel>(context, listen: false).user!.id! ==
+                  message.senderId
+              ? Alignment.centerRight
+              : Alignment.bottomLeft;
       children.add(ListTile(
         title: Align(
-          alignment: Alignment.bottomRight,
+          alignment: alignment,
           child: message.media != null && message.media!.isNotEmpty
               ? SizedBox(
                   height: 200,
@@ -233,11 +238,7 @@ class _ConversationPageState extends State<ConversationPage> {
         ),
         subtitle: message.message != null
             ? Align(
-                alignment:
-                    Provider.of<UserModel>(context, listen: false).user!.id! ==
-                            message.senderId
-                        ? Alignment.centerRight
-                        : Alignment.bottomLeft,
+                alignment: alignment,
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
