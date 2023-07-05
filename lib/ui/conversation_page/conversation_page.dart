@@ -282,11 +282,13 @@ class _ConversationPageState extends State<ConversationPage> {
 
     FocusManager.instance.primaryFocus?.unfocus();
     try {
-      await Provider.of<UserModel>(context, listen: false)
-          .sendMessage(conversation.id!, controller.text, chosenMedia);
-      controller.text = "";
-      if (chosenMedia.isNotEmpty) {
-        conversation.imageCount = conversation.getImageCount() + 1;
+      if (controller.text.isNotEmpty) {
+        await Provider.of<UserModel>(context, listen: false)
+            .sendMessage(conversation.id!, controller.text, chosenMedia);
+        controller.text = "";
+        if (chosenMedia.isNotEmpty) {
+          conversation.imageCount = conversation.getImageCount() + 1;
+        }
       }
     } catch (e) {
       showSnackBar(context, e.toString(), error: true);
