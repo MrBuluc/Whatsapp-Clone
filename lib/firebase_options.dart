@@ -53,9 +53,9 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBkE2Tnr2ELD-zqut-gcbMRYwRc3r0H-Aw',
-    appId: '1:819807584159:android:ffab08628c2af1d1b507aa',
-    messagingSenderId: '819807584159',
+    apiKey: 'apiKey',
+    appId: 'appId',
+    messagingSenderId: 'messagingSenderId',
     projectId: 'whatsapp-clone-cb94e',
     storageBucket: 'whatsapp-clone-cb94e.appspot.com',
   );
