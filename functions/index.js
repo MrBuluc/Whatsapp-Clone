@@ -1,3 +1,6 @@
+// firebase deploy --only functions:sendNotification
+// firebase functions:delete sendNotification
+
 /**
  * Import function triggers from their respective submodules:
  *
@@ -28,14 +31,13 @@ exports.sendNotification = functions.firestore
 
       const conversationId = context.params.conversationId;
 
-      (await db.collection("Conversations").doc(conversationId).get().data())[
-          "members"
-      ]
-          .filter((memberId) => memberId !== senderId)
+      (await db.collection("Conversations").doc(conversationId).get())
+          .data()
+          .members.filter((memberId) => memberId !== senderId)
           .map(async (otherMemberId) => {
             const token = (
-              await db.collection("Users").doc(otherMemberId).get().data()
-            )["token"];
+              await db.collection("Users").doc(otherMemberId).get()
+            ).data().token;
 
             if (!token) {
               return;
@@ -47,7 +49,9 @@ exports.sendNotification = functions.firestore
               notification: {
                 title: "You have a message",
                 body: message,
-                clickAction: "FLUTTER_NOTIFICATION_CLICK",
+              },
+              android: {
+                notification: {clickAction: "FLUTTER_NOTIFICATION_CLICK"},
               },
             });
           });
