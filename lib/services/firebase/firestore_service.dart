@@ -40,6 +40,21 @@ class FirestoreService {
         return conversations;
       });
 
+  Future<Conversation> getConversation(
+      String conversationId, String memberId) async {
+    int? imageCount = ((await _conversationsRef
+            .doc(conversationId)
+            .get()
+            .then((snapshot) => snapshot.data())) as Conversation)
+        .imageCount;
+    User otherUser = (await getUser(memberId))!;
+    return Conversation(
+        id: conversationId,
+        imageCount: imageCount,
+        name: otherUser.username,
+        profileImage: otherUser.pictureUrl);
+  }
+
   Future<User?> getUser(String id) async =>
       (await _usersRef.doc(id).get().then((snapshot) => snapshot.data()))
           as User;

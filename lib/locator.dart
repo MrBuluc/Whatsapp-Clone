@@ -5,6 +5,7 @@ import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
 import 'package:whatsapp_clone/services/api_services/user_api.dart';
 import 'package:whatsapp_clone/services/firebase/firestore_service.dart';
+import 'package:whatsapp_clone/services/firebase/messaging_service.dart';
 import 'package:whatsapp_clone/services/firebase/storage_service.dart';
 import 'package:whatsapp_clone/services/navigator_service.dart';
 
@@ -18,5 +19,6 @@ setupLocator() {
   locator.registerLazySingleton(() => UserApi());
   locator.registerLazySingleton(() => ConversationApi());
   locator.registerLazySingleton(() => StorageService());
+  locator.registerLazySingleton(() => MessagingService());
   locator.registerLazySingleton(() => NavigatorService());
 }

@@ -85,10 +85,14 @@ class UserModel with ChangeNotifier {
   }
 
   Future<bool> sendMessage(
-      String conversationId, String message, String chosenMedia) async {
+      String conversationId, String message, String chosenMedia,
+      {String? userId}) async {
     try {
-      return await _userRepository.sendMessage(conversationId,
-          Message(message: message, senderId: user!.id!), chosenMedia);
+      return await _userRepository.sendMessage(
+          conversationId,
+          Message(
+              message: message, senderId: user != null ? user!.id! : userId),
+          chosenMedia);
     } catch (e) {
       classPrintError("sendMessage", e);
       rethrow;

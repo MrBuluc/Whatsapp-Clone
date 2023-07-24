@@ -9,6 +9,7 @@ import 'package:whatsapp_clone/services/api_services/message_api.dart';
 import 'package:whatsapp_clone/services/api_services/time_api.dart';
 import 'package:whatsapp_clone/services/api_services/user_api.dart';
 import 'package:whatsapp_clone/services/firebase/firestore_service.dart';
+import 'package:whatsapp_clone/services/firebase/messaging_service.dart';
 import 'package:whatsapp_clone/services/firebase/storage_service.dart';
 import 'package:whatsapp_clone/services/navigator_service.dart';
 import 'package:whatsapp_clone/ui/const.dart';
@@ -18,6 +19,7 @@ import '../model/user.dart';
 class UserRepository {
   final FirestoreService _firestoreService = locator<FirestoreService>();
   final StorageService _storageService = locator<StorageService>();
+  final MessagingService _messagingService = locator<MessagingService>();
   final NavigatorService _navigatorService = locator<NavigatorService>();
   final MessageApi _messageApi = locator<MessageApi>();
   final TimeApi _timeApi = locator<TimeApi>();
@@ -30,7 +32,13 @@ class UserRepository {
   Stream<List<Conversation>> getConversations(String userId) =>
       _firestoreService.getConversations(userId);
 
-  Future<User?> getUser(String id) async => await _firestoreService.getUser(id);
+  Future<User?> getUser(String id) async {
+    String? token = await _messagingService.getUserToken();
+    if (token != null) {
+      _firestoreService.updateUser(id, {"token": token});
+    }
+    return await _firestoreService.getUser(id);
+  }
 
   Future<User?> updateUser(String id, User updatedUser) async {
     bool result =

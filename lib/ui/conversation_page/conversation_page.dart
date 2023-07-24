@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:whatsapp_clone/model/conversation.dart';
 import 'package:whatsapp_clone/model/message.dart';
+import 'package:whatsapp_clone/model/user.dart';
 import 'package:whatsapp_clone/ui/const.dart';
 import 'package:whatsapp_clone/viewmodel/user_model.dart';
 import 'package:whatsapp_clone/widgets/center_text.dart';
@@ -14,7 +15,8 @@ import 'package:whatsapp_clone/widgets/progress_elevated_button.dart';
 
 class ConversationPage extends StatefulWidget {
   final Conversation conversation;
-  const ConversationPage({Key? key, required this.conversation})
+  final String? userId;
+  const ConversationPage({Key? key, required this.conversation, this.userId})
       : super(key: key);
 
   @override
@@ -33,6 +35,7 @@ class _ConversationPageState extends State<ConversationPage> {
   late Conversation conversation;
 
   String chosenMedia = "";
+  String? userId;
 
   FocusNode focusNode = FocusNode();
 
@@ -42,6 +45,7 @@ class _ConversationPageState extends State<ConversationPage> {
   void initState() {
     super.initState();
     conversation = widget.conversation;
+    userId = widget.userId;
   }
 
   @override
@@ -221,11 +225,16 @@ class _ConversationPageState extends State<ConversationPage> {
 
     List<ListTile> children = [];
     for (Message message in messages) {
-      AlignmentGeometry alignment =
-          Provider.of<UserModel>(context, listen: false).user!.id! ==
-                  message.senderId
-              ? Alignment.centerRight
-              : Alignment.bottomLeft;
+      User? user = Provider.of<UserModel>(context, listen: false).user;
+      String localUserId = "";
+      if (user != null) {
+        localUserId = user.id!;
+      } else {
+        localUserId = userId!;
+      }
+      AlignmentGeometry alignment = localUserId == message.senderId
+          ? Alignment.centerRight
+          : Alignment.bottomLeft;
       children.add(ListTile(
         title: Align(
           alignment: alignment,
@@ -283,8 +292,9 @@ class _ConversationPageState extends State<ConversationPage> {
     FocusManager.instance.primaryFocus?.unfocus();
     try {
       if (controller.text.isNotEmpty) {
-        await Provider.of<UserModel>(context, listen: false)
-            .sendMessage(conversation.id!, controller.text, chosenMedia);
+        await Provider.of<UserModel>(context, listen: false).sendMessage(
+            conversation.id!, controller.text, chosenMedia,
+            userId: userId);
         controller.text = "";
         if (chosenMedia.isNotEmpty) {
           conversation.imageCount = conversation.getImageCount() + 1;
